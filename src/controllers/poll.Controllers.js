@@ -1,21 +1,24 @@
-//import { db } from "../Database/database.Conection.js";
-import dayjs from "dayjs"
+import { db } from "../Database/database.Conection.js";
 //import { ObjectId } from "mongodb"
 
-export async function poll(req, res){
+export async function createpoll(req, res){
 
     const { title, expireAt} = req.body  
 
     try{
 
-            if(!expireAt){
-                const dateLimit = { title, expireAt: dayjs().valueOf() }
-                await db.collection("polls").insertOne(dateLimit) 
-                return res.status(201).send(dateLimit)
-            }
+        const poll = await db.collection("polls").findOne({ title })
+        if (poll) return res.status(409).send("Essa enquete já já existe!")
+        
 
-        await db.collection("polls").insertOne({ title, expireAt})
-         res.status(201).send({title,expireAt})
+        const newPoll = {
+            title,
+            expireAt: expireAt || new Date(+new Date() + 30 * 24 * 60 * 60 * 1000)
+          };
+
+          await db.collection("polls").insertOne(newPoll)
+          res.status(201).send(newPoll)
+
    
 
         // res.send("Tudo em ordem")
@@ -26,10 +29,10 @@ export async function poll(req, res){
 }
 
 export async function readPoll(req, res){
-    const { userId } = res.locals
+    //const { userId } = res.locals
 
     try {
-        const read = await db.collection("polls").find({ userId }).toArray()
+        const read = await db.collection("polls").find({ }).toArray()
 
         res.send(read)
     } catch (err) {
