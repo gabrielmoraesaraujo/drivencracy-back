@@ -8,7 +8,7 @@ export async function createpoll(req, res){
     try{
 
         const poll = await db.collection("polls").findOne({ title })
-        if (poll) return res.status(409).send("Essa enquete já já existe!")
+        if (poll) return res.status(409).send("Essa enquete já existe!")
         
 
         const newPoll = {
